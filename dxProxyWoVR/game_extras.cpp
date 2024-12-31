@@ -188,6 +188,8 @@ int cfg_uiMultiplier = 3;
 int cfg_gameMultiplier = 2;
 bool cfg_disableControllers = false;
 bool cfg_showBodyFPS = false;
+std::string cfg_loginAccount = "";
+std::string cfg_loginPassword = "";
 inputController input = {}; //{ { 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 //----
@@ -273,6 +275,22 @@ void (*lua_Dismount)() = (void(*)())0x0051D170;
 //void (*lua_TurnOrActionStart)() = (void(*)())0x005FC610;
 //void (*lua_TurnOrActionStop)() = (void(*)())0x005FC680;
 
+namespace CGlueMgr
+{
+    const char* SetCurrentAccount(const char* name) { return ((decltype(&SetCurrentAccount))0x004D7F60)(name); }
+
+    char* m_scandllOkayToLogIn = reinterpret_cast<char*>(0x00B6B474);
+}
+
+namespace CSimpleTop
+{
+    uint32_t* m_eventTime = reinterpret_cast<uint32_t*>(0x00B499A4);
+};
+
+namespace NetClient
+{
+    void Login(const char* login, const char* password) { return ((decltype(&Login))0x004D8A30)(login, password); }
+}
 
 void RunFrameUpdateController();
 void RunFrameUpdateKeyboard();
@@ -491,6 +509,8 @@ void readConfigFile()
     std::string s_cfg_gameMultiplier = "";
     std::string s_cfg_disableControllers = "";
     std::string s_cfg_showBodyFPS = "";
+    std::string s_cfg_loginAccount = "";
+    std::string s_cfg_loginPassword = "";
 
     cfgFile.open(g_CONFIG_FILE);
     if (cfgFile.is_open())
@@ -514,6 +534,8 @@ void readConfigFile()
         std::getline(cfgFile, s_cfg_gameMultiplier);
         std::getline(cfgFile, s_cfg_disableControllers);
         std::getline(cfgFile, s_cfg_showBodyFPS);
+        std::getline(cfgFile, s_cfg_loginAccount);
+        std::getline(cfgFile, s_cfg_loginPassword);
         cfgFile.close();
 
         //----
@@ -535,6 +557,8 @@ void readConfigFile()
         s_cfg_gameMultiplier.erase(0, s_cfg_gameMultiplier.find(": ") + 2);
         s_cfg_disableControllers.erase(0, s_cfg_disableControllers.find(": ") + 2);
         s_cfg_showBodyFPS.erase(0, s_cfg_showBodyFPS.find(": ") + 2);
+        s_cfg_loginAccount.erase(0, s_cfg_loginAccount.find(": ") + 2);
+        s_cfg_loginPassword.erase(0, s_cfg_loginPassword.find(": ") + 2);
 
         //----
         // set the config options
@@ -555,6 +579,8 @@ void readConfigFile()
         cfg_gameMultiplier = std::stoi(s_cfg_gameMultiplier);
         cfg_disableControllers = s_cfg_disableControllers != "0";
         cfg_showBodyFPS = s_cfg_showBodyFPS != "0";
+        cfg_loginAccount = s_cfg_loginAccount;
+        cfg_loginPassword = s_cfg_loginPassword;
         if (cfg_uiMultiplier < 1) cfg_uiMultiplier = 1;
         if (cfg_gameMultiplier < 1) cfg_gameMultiplier = 1;
 
@@ -2356,6 +2382,43 @@ void (msub_796C10)(int a, int b, int c, int d, int e)
     //sub_796C10(a, b, c, d, e);
 }
 
+// Login
+static void AutoLogin()
+{
+    static bool s_once = false;
+    if (s_once)
+        return;
+    s_once = true;
+
+    uint32_t now = static_cast<uint32_t>(time(nullptr));
+
+    if (!cfg_loginAccount.empty() && !cfg_loginPassword.empty())
+    {
+        *CGlueMgr::m_scandllOkayToLogIn = 1;
+        *CSimpleTop::m_eventTime = now;
+
+        CGlueMgr::SetCurrentAccount(cfg_loginAccount.c_str());
+        NetClient::Login(cfg_loginAccount.c_str(), cfg_loginPassword.c_str());
+    }
+}
+
+static void (*CGlueMgr__Resume)() = (decltype(CGlueMgr__Resume))0x004DA9AC;
+static void __declspec(naked) CGlueMgr__Resume_hk()
+{
+    __asm {
+        pop ebx;
+        mov esp, ebp;
+        pop ebp;
+
+        pushad;
+        pushfd;
+        call AutoLogin;
+        popfd;
+        popad;
+        ret;
+    }
+}
+
 void InitDetours(HANDLE hModule)
 {
     //if (doLog) logError << "-- InitDetours Start" << std::endl;
@@ -2387,6 +2450,7 @@ void InitDetours(HANDLE hModule)
     DetourAttach((PVOID*)&CFrameStrata__RenderBatches, (PVOID)CFrameStrata__RenderBatches_hk);      // StartUI
     DetourAttach((PVOID*)&CSimpleTop__OnLayerRender, (PVOID)CSimpleTop__OnLayerRender_hk);          // Start Render
     DetourAttach((PVOID*)&OnPaint, (PVOID)OnPaint_hk);                                              // OnPaint
+    DetourAttach((PVOID*)&CGlueMgr__Resume, (PVOID)CGlueMgr__Resume_hk);                             // AutoLogin
 
     DetourAttach((PVOID*)&sub_6A38D0, (PVOID)msub_6A38D0); // Skybox fix?
     DetourAttach((PVOID*)&sub_796C10, (PVOID)msub_796C10); // GreyBox
