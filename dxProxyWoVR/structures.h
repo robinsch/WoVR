@@ -204,7 +204,7 @@ struct st20Container
 	int ptrSKIN;							// 0x0170
 };
 
-struct stModelContainer
+struct CM2Model
 {
 	char unknown1[0x002C];					// 0x0000
 	st20Container* p20Container;			// 0x002C
@@ -270,7 +270,7 @@ struct stObjectManager
 	float scale1;							// 0x0098
 	float scale2;							// 0x009C
 	char unknown5[0x0014];					// 0x00A0
-	stModelContainer* pModelContainer;		// 0x00B4
+	CM2Model* pModelContainer;		// 0x00B4
 	char unknown6[0x10];					// 0x00B8
 	byte alpha1;							// 0x00C8
 	byte alpha2;							// 0x00C9
@@ -286,5 +286,70 @@ struct stObjectManager
 	int unknown11;							// 0x1008
 	char unknown12[0xA58];					// 0x100C
 	int modelID;							// 0x1A64
+};
+
+namespace CGlueMgr
+{
+	const char* SetCurrentAccount(const char* name) { return ((decltype(&SetCurrentAccount))0x004D7F60)(name); }
+
+	char* m_scandllOkayToLogIn = reinterpret_cast<char*>(0x00B6B474);
+}
+
+namespace CSimpleTop
+{
+	uint32_t* m_eventTime = reinterpret_cast<uint32_t*>(0x00B499A4);
+};
+
+namespace NetClient
+{
+	void Login(const char* login, const char* password) { return ((decltype(&Login))0x004D8A30)(login, password); }
+}
+
+struct C3Vector
+{
+	float x;
+	float y;
+	float z;
+};
+
+struct C44Matrix
+{
+	float a0 = 1.f;
+	float a1 = 0.f;
+	float a2 = 0.f;
+	float a3 = 0.f;
+	float b0 = 0.f;
+	float b1 = 1.f;
+	float b2 = 0.f;
+	float b3 = 0.f;
+	float c0 = 0.f;
+	float c1 = 0.f;
+	float c2 = 1.f;
+	float c3 = 0.f;
+	float d0 = 0.f;
+	float d1 = 0.f;
+	float d2 = 0.f;
+	float d3 = 1.f;
+};
+
+struct CGCamera
+{
+	void* m_vmt;
+	uint32_t m_refcount;
+	C3Vector m_position;
+	float m_rotation[6];
+	float m_yaw;
+	float m_pitch;
+	float m_roll;
+	float m_nearClip;
+	float m_farClip;
+	float m_fov;
+};
+
+struct CGInputControl
+{
+	static CGInputControl* GetActive() { return *reinterpret_cast<CGInputControl**>(0x00C24954); }
+
+	inline void SetFacing(uint32_t time, float yaw) { ((void(__thiscall*)(CGInputControl*, uint32_t, float))0x005FB260)(this, time, yaw); }
 };
 #pragma pack(pop)

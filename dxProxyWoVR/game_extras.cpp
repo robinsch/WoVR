@@ -275,23 +275,6 @@ void (*lua_Dismount)() = (void(*)())0x0051D170;
 //void (*lua_TurnOrActionStart)() = (void(*)())0x005FC610;
 //void (*lua_TurnOrActionStop)() = (void(*)())0x005FC680;
 
-namespace CGlueMgr
-{
-    const char* SetCurrentAccount(const char* name) { return ((decltype(&SetCurrentAccount))0x004D7F60)(name); }
-
-    char* m_scandllOkayToLogIn = reinterpret_cast<char*>(0x00B6B474);
-}
-
-namespace CSimpleTop
-{
-    uint32_t* m_eventTime = reinterpret_cast<uint32_t*>(0x00B499A4);
-};
-
-namespace NetClient
-{
-    void Login(const char* login, const char* password) { return ((decltype(&Login))0x004D8A30)(login, password); }
-}
-
 void RunFrameUpdateController();
 void RunFrameUpdateKeyboard();
 void RunControllerGame();
@@ -901,26 +884,26 @@ XMMATRIX GetGameCamera(int camAddress, bool convert = false)
         return XMMatrixIdentity();
 }
 
-void SetGameCamera(int camAddress, XMMATRIX camMatrix, bool convert = false)
+void SetGameCamera(CGCamera* camera, XMMATRIX camMatrix, bool convert = false)
 {
-    if (camAddress)
+    if (camera)
     {
         if (convert)
             camMatrix = DxToGame(camMatrix);
 
-        *(float*)(camAddress + 0x08) = camMatrix(3, 0);
-        *(float*)(camAddress + 0x0C) = camMatrix(3, 1);
-        *(float*)(camAddress + 0x10) = camMatrix(3, 2);
+        camera->m_position.x = camMatrix(3, 0);
+        camera->m_position.y = camMatrix(3, 1);
+        camera->m_position.z = camMatrix(3, 2);
 
-        *(float*)(camAddress + 0x14) = camMatrix(0, 0);
-        *(float*)(camAddress + 0x18) = camMatrix(0, 1);
-        *(float*)(camAddress + 0x1C) = camMatrix(0, 2);
-        *(float*)(camAddress + 0x20) = camMatrix(1, 0);
-        *(float*)(camAddress + 0x24) = camMatrix(1, 1);
-        *(float*)(camAddress + 0x28) = camMatrix(1, 2);
-        *(float*)(camAddress + 0x2C) = camMatrix(2, 0);
-        *(float*)(camAddress + 0x30) = camMatrix(2, 1);
-        *(float*)(camAddress + 0x34) = camMatrix(2, 2);
+        camera->m_rotation[0] = camMatrix(0, 0);
+        camera->m_rotation[1] = camMatrix(0, 1);
+        camera->m_rotation[2] = camMatrix(0, 2);
+        camera->m_rotation[3] = camMatrix(1, 0);
+        camera->m_rotation[4] = camMatrix(1, 1);
+        camera->m_rotation[5] = camMatrix(1, 2);
+        camera->m_yaw = camMatrix(2, 0);
+        camera->m_pitch = camMatrix(2, 1);
+        camera->m_roll = camMatrix(2, 2);
     }
 }
 
@@ -940,6 +923,8 @@ void fnUpdateCameraHMD(int camAddress)
 {
     if (camAddress)
     {
+        CGCamera* camera = reinterpret_cast<CGCamera*>(camAddress);
+
         cameraMatrixGame = GetGameCamera(camAddress, false);
         cameraMatrix = GameToDx(cameraMatrixGame);
 
@@ -955,8 +940,8 @@ void fnUpdateCameraHMD(int camAddress)
             cameraMatrixIPD = matHMDPos;
         cameraMatrixIPD *= cameraMatrix;
 
-        SetGameCamera(camAddress, cameraMatrixIPD, true);
-        *(float*)(camAddress + 0x40) = maxRadRot;
+        SetGameCamera(camera, cameraMatrixIPD, true);
+        camera->m_fov = maxRadRot;
     }
 }
 
@@ -1344,11 +1329,11 @@ void(__fastcall msub_5FF530)(void* ecx, void* edx)
 }
 
 // Update Camera Fn
-void(__thiscall* CGCamera__CalcTargetCamera)(void*, int, int) = (void(__thiscall*)(void*, int, int))0x00606F90;
-void(__fastcall CGCamera__CalcTargetCamera_hk)(void* ecx, void* edx, int a, int b)
+void(__thiscall* CGCamera__CalcTargetCamera)(CGCamera*, int, int) = (void(__thiscall*)(CGCamera*, int, int))0x00606F90;
+void(__fastcall CGCamera__CalcTargetCamera_hk)(CGCamera* camera, void* edx, int a, int b)
 {
-    CGCamera__CalcTargetCamera(ecx, a, b);
-    fnUpdateCameraHMD((int)ecx);
+    CGCamera__CalcTargetCamera(camera, a, b);
+    fnUpdateCameraHMD((int)camera);
 }
 
 // Slows animation value (frame timing?)
