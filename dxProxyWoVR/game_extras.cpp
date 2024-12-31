@@ -987,8 +987,8 @@ int IntersectGround(RayTarget* rayTarget)
 }
 
 // Mouse to world ray caluclations
-void (*sub_4BF0F0)(float, float, Vector3*, Vector3*) = (void (*)(float, float, Vector3*, Vector3*))0x004BF0F0;
-void (msub_4BF0F0)(float a, float b, Vector3* c, Vector3* d)
+void (*CameraGetLineSegment)(float, float, Vector3*, Vector3*) = (void (*)(float, float, Vector3*, Vector3*))0x004BF0F0;
+void (CameraGetLineSegment_hk)(float a, float b, Vector3* c, Vector3* d)
 {
     XMMATRIX rayMatrix = XMMatrixIdentity();
     if (cfg_disableControllers)
@@ -1291,8 +1291,8 @@ void(__fastcall msub_6A7610)(void* ecx, void* edx)
 
 
 // Should Render Char
-void(__thiscall* sub_6E0840)(void*, int, int, int) = (void(__thiscall*)(void*, int, int, int))0x006E0840;
-void(__fastcall msub_6E0840)(void* ecx_, void* edx_, int a, int b, int c)
+void(__thiscall* CGPlayer_C__ShouldRender)(void*, int, int, int) = (void(__thiscall*)(void*, int, int, int))0x006E0840;
+void(__fastcall CGPlayer_C__ShouldRender_hk)(void* ecx_, void* edx_, int a, int b, int c)
 {
     int showHidePlayer = 0;
     if (curEye == 0 || curEye == 1) {
@@ -1306,7 +1306,7 @@ void(__fastcall msub_6E0840)(void* ecx_, void* edx_, int a, int b, int c)
         *(DWORD*)0xC9D540 = false;
     else
         *(DWORD*)0xC9D540 = true;
-    sub_6E0840(ecx_, a, b, c);
+    CGPlayer_C__ShouldRender(ecx_, a, b, c);
 }
 
 // Update Freelook Camera
@@ -1318,38 +1318,38 @@ void(__fastcall msub_5FF530)(void* ecx, void* edx)
 }
 
 // Update Camera Fn
-void(__thiscall* sub_606F90)(void*, int, int) = (void(__thiscall*)(void*, int, int))0x00606F90;
-void(__fastcall msub_606F90)(void* ecx, void* edx, int a, int b)
+void(__thiscall* CGCamera__CalcTargetCamera)(void*, int, int) = (void(__thiscall*)(void*, int, int))0x00606F90;
+void(__fastcall CGCamera__CalcTargetCamera_hk)(void* ecx, void* edx, int a, int b)
 {
-    sub_606F90(ecx, a, b);
+    CGCamera__CalcTargetCamera(ecx, a, b);
     fnUpdateCameraHMD((int)ecx);
 }
 
 // Slows animation value (frame timing?)
-void (*sub_77EFF0)(int, float) = (void (*)(int, float))0x0077EFF0;
-void (msub_77EFF0)(int a, float b)
+void (*World__Render)(int, float) = (void (*)(int, float))0x0077EFF0;
+void (World__Render_hk)(int a, float b)
 {
     b = b / 2.f;
-    sub_77EFF0(a, b);
+    World__Render(a, b);
 }
 
 // Dynamic model animations
-void(__thiscall* sub_82F0F0)(void*, int, int, int, int, int) = (void(__thiscall*)(void*, int, int, int, int, int))0x0082F0F0;
-void(__fastcall msub_82F0F0)(void* ecx, void* edx, int a, int b, int c, int d, int e)
+void(__thiscall* CM2Model__AnimateMT)(void*, int, int, int, int, int) = (void(__thiscall*)(void*, int, int, int, int, int))0x0082F0F0;
+void(__fastcall CM2Model__AnimateMT_hk)(void* ecx, void* edx, int a, int b, int c, int d, int e)
 {
-    sub_82F0F0(ecx, a, b, c, d, e);
+    CM2Model__AnimateMT(ecx, a, b, c, d, e);
     
     if (gPlayerObj && gPlayerObj->pModelContainer == ecx)
         UpdateCharacterAnimation_post(gPlayerObj);
 }
 
 // Update Model Proj
-void(__thiscall* sub_6A9B40)(void*, int) = (void(__thiscall*)(void*, int))0x006A9B40;
-void(__fastcall msub_6A9B40)(void* ecx, void* edx, int a)
+void(__thiscall* CGxDevice__XformSetProjection)(void*, int) = (void(__thiscall*)(void*, int))0x006A9B40;
+void(__fastcall CGxDevice__XformSetProjection_hk)(void* ecx, void* edx, int a)
 {
     if (svr->isEnabled())
     {
-        sub_6A9B40(ecx, a);
+        CGxDevice__XformSetProjection(ecx, a);
 
         int projMatrixAddr = *(int*)(0x0C5DF88);
         projMatrixAddr = projMatrixAddr + 0xFC8;
@@ -1369,30 +1369,30 @@ void(__fastcall msub_6A9B40)(void* ecx, void* edx, int a)
     }
     else
     {
-        sub_6A9B40(ecx, a);
+        CGxDevice__XformSetProjection(ecx, a);
     }
 }
 
 // Render Mouse
-void(__thiscall* sub_687A90)(void*) = (void(__thiscall*)(void*))0x00687A90;
-void(__fastcall msub_687A90)(void* ecx, void* edx)
+void(__thiscall* CGxDevice__ICursorDraw)(void*) = (void(__thiscall*)(void*))0x00687A90;
+void(__fastcall CGxDevice__ICursorDraw_hk)(void* ecx, void* edx)
 {
-    sub_687A90(ecx);
+    CGxDevice__ICursorDraw(ecx);
 }
 
 // StartUI
-void(__thiscall* sub_494F30)(int) = (void(__thiscall*)(int))0x00494F30;
-void(__fastcall msub_494F30)(void* ecx, void* edx)
+void(__thiscall* CFrameStrata__RenderBatches)(int) = (void(__thiscall*)(int))0x00494F30;
+void(__fastcall CFrameStrata__RenderBatches_hk)(void* ecx, void* edx)
 {
-    sub_494F30((int)ecx);
+    CFrameStrata__RenderBatches((int)ecx);
 }
 
 // Start Render
-void (*sub_4BEE60)(float*, float*, int, int) = (void (*)(float*, float*, int, int))0x004BEE60;
-void(__thiscall* sub_494EE0)(int, int) = (void(__thiscall*)(int, int))0x00494EE0;
+void (*CameraSetupScreenProjection)(float*, float*, int, int) = (void (*)(float*, float*, int, int))0x004BEE60;
+void(__thiscall* CFrameStrata__BuildBatches)(int, int) = (void(__thiscall*)(int, int))0x00494EE0;
 
-void(__thiscall* sub_495410)(void*) = (void(__thiscall*)(void*))0x00495410;
-void(__fastcall msub_495410)(void* ecx, void* edx)
+void(__thiscall* CSimpleTop__OnLayerRender)(void*) = (void(__thiscall*)(void*))0x00495410;
+void(__fastcall CSimpleTop__OnLayerRender_hk)(void* ecx, void* edx)
 {
     if (svr->isEnabled())
     {
@@ -1436,7 +1436,7 @@ void(__fastcall msub_495410)(void* ecx, void* edx)
         b[1] = 0.0f; 
 
         //sub_4BEE60(a, b, 0, 0);
-        sub_4BEE60((float*)((int)ecx + 0x44), b, 0, 0);
+        CameraSetupScreenProjection((float*)((int)ecx + 0x44), b, 0, 0);
 
         //----
         // Checks to see if were in the game world or ui
@@ -1485,8 +1485,8 @@ void(__fastcall msub_495410)(void* ecx, void* edx)
             {
                 int tBool = *(int*)((int)ecx + 0x7C);
                 int tesi = *(int*)(esi + (i * 4));
-                sub_494EE0(tesi, tBool == 0);
-                sub_494F30(tesi);
+                CFrameStrata__BuildBatches(tesi, tBool == 0);
+                CFrameStrata__RenderBatches(tesi);
             }
         }
 
@@ -1767,13 +1767,13 @@ void(__fastcall msub_495410)(void* ecx, void* edx)
     }
     else
     {
-        sub_495410(ecx);
+        CSimpleTop__OnLayerRender(ecx);
     }
 }
 
 // OnPrint
-void(__thiscall* sub_4A8720)() = (void(__thiscall*)())0x004A8720;
-void(__fastcall msub_4A8720)()
+void(__thiscall* OnPaint)() = (void(__thiscall*)())0x004A8720;
+void(__fastcall OnPaint_hk)()
 {
     gPlayerObj = nullptr;
     isPossessing = false;
@@ -1847,7 +1847,7 @@ void(__fastcall msub_4A8720)()
         svr->SetProjection({ *(float*)0xADEED4, *(float*)0xCD7748 });
 
         RunControllerGame();
-        sub_4A8720();
+        OnPaint();
 
         resetPlayerAnimCounter = true;
 
@@ -1873,7 +1873,7 @@ void(__fastcall msub_4A8720)()
     }
     else
     {
-        sub_4A8720();
+        OnPaint();
     }
     gPlayerObj = nullptr;
 }
@@ -2363,7 +2363,7 @@ void InitDetours(HANDLE hModule)
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    DetourAttach((PVOID*)&sub_4BF0F0, (PVOID)msub_4BF0F0); // Mouse to world ray caluclations
+    DetourAttach((PVOID*)&CameraGetLineSegment, (PVOID)CameraGetLineSegment_hk); // Mouse to world ray caluclations
 
     DetourAttach((PVOID*)&sub_869DB0, (PVOID)msub_869DB0); // SetClientMouseResetPoint
     DetourAttach((PVOID*)&sub_684D70, (PVOID)msub_684D70); // Calculate window size
@@ -2377,16 +2377,16 @@ void InitDetours(HANDLE hModule)
     DetourAttach((PVOID*)&sub_6A7540, (PVOID)msub_6A7540); // End SceneSetup
     DetourAttach((PVOID*)&sub_6A7610, (PVOID)msub_6A7610); // Present Scene
 
-    DetourAttach((PVOID*)&sub_6E0840, (PVOID)msub_6E0840); // Should Render Char
-    DetourAttach((PVOID*)&sub_5FF530, (PVOID)msub_5FF530); // Update freelook Camera
-    DetourAttach((PVOID*)&sub_606F90, (PVOID)msub_606F90); // Update Camera Fn
-    DetourAttach((PVOID*)&sub_77EFF0, (PVOID)msub_77EFF0); // Slows animation value
-    DetourAttach((PVOID*)&sub_82F0F0, (PVOID)msub_82F0F0); // Dynamic model animations
-    DetourAttach((PVOID*)&sub_6A9B40, (PVOID)msub_6A9B40); // Update Model Proj
-    DetourAttach((PVOID*)&sub_687A90, (PVOID)msub_687A90); // Render Mouse
-    DetourAttach((PVOID*)&sub_494F30, (PVOID)msub_494F30);
-    DetourAttach((PVOID*)&sub_495410, (PVOID)msub_495410); // Start Render
-    DetourAttach((PVOID*)&sub_4A8720, (PVOID)msub_4A8720); // OnPaint
+    DetourAttach((PVOID*)&CGPlayer_C__ShouldRender, (PVOID)CGPlayer_C__ShouldRender_hk);            // Should Render Char
+    DetourAttach((PVOID*)&sub_5FF530, (PVOID)msub_5FF530);                                          // Update freelook Camera
+    DetourAttach((PVOID*)&CGCamera__CalcTargetCamera, (PVOID)CGCamera__CalcTargetCamera_hk);        // Update Camera Fn
+    DetourAttach((PVOID*)&World__Render, (PVOID)World__Render_hk);                                  // Slows animation value
+    DetourAttach((PVOID*)&CM2Model__AnimateMT, (PVOID)CM2Model__AnimateMT_hk);                      // Dynamic model animations
+    DetourAttach((PVOID*)&CGxDevice__XformSetProjection, (PVOID)CGxDevice__XformSetProjection_hk);  // Update Model Proj
+    DetourAttach((PVOID*)&CGxDevice__ICursorDraw, (PVOID)CGxDevice__ICursorDraw_hk);                // Render Mouse
+    DetourAttach((PVOID*)&CFrameStrata__RenderBatches, (PVOID)CFrameStrata__RenderBatches_hk);      // StartUI
+    DetourAttach((PVOID*)&CSimpleTop__OnLayerRender, (PVOID)CSimpleTop__OnLayerRender_hk);          // Start Render
+    DetourAttach((PVOID*)&OnPaint, (PVOID)OnPaint_hk);                                              // OnPaint
 
     DetourAttach((PVOID*)&sub_6A38D0, (PVOID)msub_6A38D0); // Skybox fix?
     DetourAttach((PVOID*)&sub_796C10, (PVOID)msub_796C10); // GreyBox
@@ -2415,7 +2415,7 @@ void ExitDetours()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     
-    DetourDetach((PVOID*)&sub_4BF0F0, (PVOID)msub_4BF0F0); // Mouse to world ray caluclations
+    DetourDetach((PVOID*)&CameraGetLineSegment, (PVOID)CameraGetLineSegment_hk); // Mouse to world ray caluclations
 
     DetourDetach((PVOID*)&sub_869DB0, (PVOID)msub_869DB0); // SetClientMouseResetPoint
     DetourDetach((PVOID*)&sub_684D70, (PVOID)msub_684D70); // Calculate window size
@@ -2429,16 +2429,16 @@ void ExitDetours()
     DetourDetach((PVOID*)&sub_6A7540, (PVOID)msub_6A7540); // End SceneSetup
     DetourDetach((PVOID*)&sub_6A7610, (PVOID)msub_6A7610); // Present Scene
 
-    DetourDetach((PVOID*)&sub_6E0840, (PVOID)msub_6E0840); // Should Render Char
-    DetourDetach((PVOID*)&sub_5FF530, (PVOID)msub_5FF530); // Update freelook Camera
-    DetourDetach((PVOID*)&sub_606F90, (PVOID)msub_606F90); // Update Camera Fn
-    DetourDetach((PVOID*)&sub_77EFF0, (PVOID)msub_77EFF0); // Slows animation value
-    DetourDetach((PVOID*)&sub_82F0F0, (PVOID)msub_82F0F0); // Dynamic model animations
-    DetourDetach((PVOID*)&sub_6A9B40, (PVOID)msub_6A9B40); // Update Model Proj
-    DetourDetach((PVOID*)&sub_687A90, (PVOID)msub_687A90); // Render Mouse
-    DetourDetach((PVOID*)&sub_494F30, (PVOID)msub_494F30);
-    DetourDetach((PVOID*)&sub_495410, (PVOID)msub_495410); // Start Render
-    DetourDetach((PVOID*)&sub_4A8720, (PVOID)msub_4A8720); // OnPaint
+    DetourDetach((PVOID*)&CGPlayer_C__ShouldRender, (PVOID)CGPlayer_C__ShouldRender_hk);            // Should Render Char
+    DetourDetach((PVOID*)&sub_5FF530, (PVOID)msub_5FF530);                                          // Update freelook Camera
+    DetourDetach((PVOID*)&CGCamera__CalcTargetCamera, (PVOID)CGCamera__CalcTargetCamera_hk);        // Update Camera Fn
+    DetourDetach((PVOID*)&World__Render, (PVOID)World__Render_hk);                                  // Slows animation value
+    DetourDetach((PVOID*)&CM2Model__AnimateMT, (PVOID)CM2Model__AnimateMT_hk);                      // Dynamic model animations
+    DetourDetach((PVOID*)&CGxDevice__XformSetProjection, (PVOID)CGxDevice__XformSetProjection_hk);  // Update Model Proj
+    DetourDetach((PVOID*)&CGxDevice__ICursorDraw, (PVOID)CGxDevice__ICursorDraw_hk);                // Render Mouse
+    DetourDetach((PVOID*)&CFrameStrata__RenderBatches, (PVOID)CFrameStrata__RenderBatches_hk);      // StartUI
+    DetourDetach((PVOID*)&CSimpleTop__OnLayerRender, (PVOID)CSimpleTop__OnLayerRender_hk);          // Start Render
+    DetourDetach((PVOID*)&OnPaint, (PVOID)OnPaint_hk);                                              // OnPaint
 
     DetourDetach((PVOID*)&sub_6A38D0, (PVOID)msub_6A38D0); // Skybox fix?
     DetourDetach((PVOID*)&sub_796C10, (PVOID)msub_796C10); // GreyBox
